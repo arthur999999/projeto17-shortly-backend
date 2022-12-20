@@ -64,10 +64,29 @@ export async function LoginUser(req, res) {
         return
     }
 
-    const emailExist = await connection.query(`SELECT * FROM users WHEN email = $1`, [login.email])
+    try {
+        const emailExist = await connection.query(`SELECT * FROM users WHERE email = $1`, [login.email])
 
-    if(!emailExist.rows[0]){
+        if(!emailExist.rows[0]){
+            res.sendStatus(401)
+            return
+        }
+
+        if(bcrypt.compareSync(login.password, emailExist.rows[0].password)){
+            const token = uuid()
+
+            await connection.query(`INSERT INTO sessions ("userId", token) VALUES ($1, $2)`, [emailExist.rows[0].id, token])
+
+            res.status(200).send(token)
+
+            return
+        }
+
         res.sendStatus(401)
+    } catch (error) {
+        res.status(400).send(error.message)
     }
+
+    
 
 }

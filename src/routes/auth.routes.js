@@ -5,7 +5,7 @@ import { RegisterUser } from "../controllers/auth.controller.js"
 
 const authRouter = Router()
 
-authRouter.get('/signup', RegisterUser)
+authRouter.post('/signup', RegisterUser)
 
 
 export default authRouter

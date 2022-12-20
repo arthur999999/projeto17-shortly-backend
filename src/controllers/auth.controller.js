@@ -1,5 +1,6 @@
 import joi from "joi"
-
+import bcrypt from "bcrypt"
+import { v4 as uuid } from 'uuid'
 import { connection } from "../database/db.js"
 
 const registerSchema = joi.object({
@@ -35,12 +36,38 @@ export async function RegisterUser(req, res) {
             return
         }
 
-        await connection.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [register.name, register.email, register.password])
+        const passwordEncrypt = bcrypt.hashSync(register.password, 10)
+
+        await connection.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [register.name, register.email, passwordEncrypt])
 
         res.sendStatus(201)
 
     } catch (error) {
         res.status(400).send(error.message)
+    }
+
+}
+
+const loginSchema = joi.object({
+    email: joi.string().required(),
+    password: joi.string().required()
+})
+
+export async function LoginUser(req, res) {
+
+    const login = req.body
+
+    const validation = loginSchema.validate(login, {abortEarly: false})
+
+    if(validation.error){
+        res.status(422).send(validation.error.message)
+        return
+    }
+
+    const emailExist = await connection.query(`SELECT * FROM users WHEN email = $1`, [login.email])
+
+    if(!emailExist.rows[0]){
+        res.sendStatus(401)
     }
 
 }

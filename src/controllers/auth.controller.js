@@ -1,7 +1,7 @@
 import joi from "joi"
 import bcrypt from "bcrypt"
 import { v4 as uuid } from 'uuid'
-import { connection } from "../database/db.js"
+import userRepository from "../repositories/user.repository.js"
 
 const registerSchema = joi.object({
     name: joi.string().required(),
@@ -29,7 +29,8 @@ export async function RegisterUser(req, res) {
     }
 
     try {
-        const sameEmail = await connection.query(`SELECT * FROM users WHERE email = $1`, [register.email])
+
+        const sameEmail = await userRepository.getEmail(register.email)
 
         if(sameEmail.rows[0]){
             res.sendStatus(409)
@@ -38,7 +39,7 @@ export async function RegisterUser(req, res) {
 
         const passwordEncrypt = bcrypt.hashSync(register.password, 10)
 
-        await connection.query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`, [register.name, register.email, passwordEncrypt])
+        await userRepository.createUser(register.name, register.email, passwordEncrypt)
 
         res.sendStatus(201)
 
@@ -65,7 +66,7 @@ export async function LoginUser(req, res) {
     }
 
     try {
-        const emailExist = await connection.query(`SELECT * FROM users WHERE email = $1`, [login.email])
+        const emailExist = await userRepository.getEmail(login.email)
 
         if(!emailExist.rows[0]){
             res.sendStatus(401)
@@ -75,7 +76,7 @@ export async function LoginUser(req, res) {
         if(bcrypt.compareSync(login.password, emailExist.rows[0].password)){
             const token = uuid()
 
-            await connection.query(`INSERT INTO sessions ("userId", token) VALUES ($1, $2)`, [emailExist.rows[0].id, token])
+            await userRepository.createSessions(emailExist.rows[0].id, token)
 
             res.status(200).send(token)
 
@@ -85,8 +86,7 @@ export async function LoginUser(req, res) {
         res.sendStatus(401)
     } catch (error) {
         res.status(400).send(error.message)
+        return
     }
-
-    
 
 }

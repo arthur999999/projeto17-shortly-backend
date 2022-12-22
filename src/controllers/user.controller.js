@@ -1,6 +1,5 @@
 import joi from "joi"
 import { nanoid } from "nanoid"
-import { connection } from "../database/db.js"
 import userRepository from "../repositories/user.repository.js"
 
 const urlSchema = joi.object({
@@ -32,6 +31,34 @@ export async function ShortUrl (req, res) {
         res.status(201).send({
             shortUrl: shortURL
         })
+
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+
+    
+}
+
+export async function getUrl(req, res) {
+
+    const id = req.params.id
+
+    try {
+
+        const urlShort = await userRepository.getUrlId(id)
+
+        if(!urlShort.rows[0]){
+            res.sendStatus(404)
+            return
+        }
+
+        const objectUrl = {
+            id: id,
+            shortUrl: urlShort.rows[0].shorten,
+            url: urlShort.rows[0].url
+        }
+
+        res.status(200).send(objectUrl)
 
     } catch (error) {
         res.status(400).send(error.message)

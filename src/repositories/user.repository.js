@@ -37,6 +37,10 @@ async function updateViews(num, shorten){
     return connection.query(`UPDATE links SET views = $1 WHERE shorten = $2;`, [num, shorten])
 }
 
+async function deleteUrl(id){
+    return connection.query(`DELETE FROM links WHERE id = $1;`, [id])
+}
+
 const userRepository = {
 	getUser,
     getEmail,
@@ -46,7 +50,9 @@ const userRepository = {
     createShorten,
     getUrlId,
     getUrlShort,
-    updateViews
+    updateViews,
+    deleteUrl
+
 }
 
 export default userRepository

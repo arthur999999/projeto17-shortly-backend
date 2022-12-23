@@ -19,7 +19,7 @@ export async function tokenValidation (req, res, next) {
         const session = await userRepository.getSession(token)
 
         if(!session.rows[0]){
-            res.sendStatus(404)
+            res.sendStatus(401)
             return
         }
 

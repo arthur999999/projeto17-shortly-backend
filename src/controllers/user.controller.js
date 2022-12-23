@@ -83,9 +83,36 @@ export async function openLink (req, res){
         await userRepository.updateViews(count, shortURL)
 
         res.redirect(link.rows[0].url)
-        
+
     } catch (error) {
         res.status(400).send(error.message)
     }
 
+}
+
+export async function deleteLink(req, res) {
+    const id = req.params.id
+
+    const userId = req.userId
+
+    try {
+
+        const url = await userRepository.getUrlId(id)
+
+        if(!url.rows[0]){
+            res.sendStatus(404)
+            return
+        }
+
+        if(url.rows[0].userId != userId){
+            res.sendStatus(401)
+            return
+        }
+
+        await userRepository.deleteUrl(id)
+
+        res.sendStatus(204)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
 }

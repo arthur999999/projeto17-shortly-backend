@@ -41,6 +41,14 @@ async function deleteUrl(id){
     return connection.query(`DELETE FROM links WHERE id = $1;`, [id])
 }
 
+async function getUserData(id) {
+    return connection.query(`SELECT users.id, users.name, SUM(links.views) as "visitCount" FROM users JOIN links ON users.id = links."userId" WHERE users.id = $1 GROUP BY users.id;`, [id])
+}
+
+async function getUrlUser(id) {
+    return connection.query(`SELECT links.id, links.shorten as "shortUrl", links.url, links.views as "visitCount" FROM links WHERE links."userId" = $1;`, [id])
+}
+
 const userRepository = {
 	getUser,
     getEmail,
@@ -51,7 +59,9 @@ const userRepository = {
     getUrlId,
     getUrlShort,
     updateViews,
-    deleteUrl
+    deleteUrl,
+    getUserData,
+    getUrlUser
 
 }
 

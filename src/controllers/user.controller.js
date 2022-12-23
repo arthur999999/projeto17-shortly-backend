@@ -116,3 +116,31 @@ export async function deleteLink(req, res) {
         res.status(400).send(error.message)
     }
 }
+
+export async function getUserData (req, res){
+    const userId = req.userId
+
+    try {
+        
+        const userData = await userRepository.getUserData(userId)
+
+        if(!userData.rows[0]){
+            res.sendStatus(404)
+            return
+        }
+
+        const links = await userRepository.getUrlUser(userId)
+
+        const object = {
+            id: userData.rows[0].id,
+            name: userData.rows[0].name,
+            visitCount: userData.rows[0].visitCount,
+            shortenedUrls: links.rows
+        }
+
+        res.status(200).send(object)
+
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+}

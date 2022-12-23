@@ -5,7 +5,7 @@ import userRepository from "../repositories/user.repository.js"
 
 const registerSchema = joi.object({
     name: joi.string().required(),
-    email: joi.string().required(),
+    email: joi.string().email().required(),
     password: joi.string().required(),
     confirmPassword: joi.string().required()
 
@@ -50,7 +50,7 @@ export async function RegisterUser(req, res) {
 }
 
 const loginSchema = joi.object({
-    email: joi.string().required(),
+    email: joi.string().email().required(),
     password: joi.string().required()
 })
 

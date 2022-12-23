@@ -3,7 +3,7 @@ import { nanoid } from "nanoid"
 import userRepository from "../repositories/user.repository.js"
 
 const urlSchema = joi.object({
-    url: joi.string().required()
+    url: joi.string().uri().required()
 })
 
 

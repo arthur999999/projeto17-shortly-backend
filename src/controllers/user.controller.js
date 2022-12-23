@@ -64,5 +64,28 @@ export async function getUrl(req, res) {
         res.status(400).send(error.message)
     }
 
-    
+}
+
+export async function openLink (req, res){
+
+    const shortURL = req.params.shortUrl
+
+    try {
+        const link = await userRepository.getUrlShort(shortURL)
+
+        if(!link.rows[0]){
+            res.sendStatus(404)
+            return
+        }
+
+        const count = link.rows[0].views + 1
+
+        await userRepository.updateViews(count, shortURL)
+
+        res.redirect(link.rows[0].url)
+        
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+
 }

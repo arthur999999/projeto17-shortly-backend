@@ -29,6 +29,14 @@ async function getUrlId(id){
     return connection.query(`SELECT * FROM links WHERE id = $1;`, [id])
 }
 
+async function getUrlShort(short){
+    return connection.query(`SELECT * FROM links WHERE shorten = $1;`, [short])
+}
+
+async function updateViews(num, shorten){
+    return connection.query(`UPDATE links SET views = $1 WHERE shorten = $2;`, [num, shorten])
+}
+
 const userRepository = {
 	getUser,
     getEmail,
@@ -36,7 +44,9 @@ const userRepository = {
     createSessions,
     getSession,
     createShorten,
-    getUrlId
+    getUrlId,
+    getUrlShort,
+    updateViews
 }
 
 export default userRepository

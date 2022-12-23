@@ -144,3 +144,19 @@ export async function getUserData (req, res){
         res.status(400).send(error.message)
     }
 }
+
+export async function getRanking (req, res) {
+
+    try {
+        const {rows} = await userRepository.getRanking()
+
+        rows.forEach((m)=> {if(m.visitCount == null){
+            m.visitCount = 0
+        }})
+
+        res.status(200).send(rows)
+
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+}   

@@ -49,6 +49,11 @@ async function getUrlUser(id) {
     return connection.query(`SELECT links.id, links.shorten as "shortUrl", links.url, links.views as "visitCount" FROM links WHERE links."userId" = $1;`, [id])
 }
 
+async function getRanking () {
+    return connection.query(`SELECT users.id, users.name, COUNT(links.id) as "linksCount", SUM(links.views) as "visitCount" FROM users LEFT JOIN links ON users.id = links."userId" GROUP BY users.id ORDER BY "visitCount" DESC NULLS LAST LIMIT 10;
+    `)
+}
+
 const userRepository = {
 	getUser,
     getEmail,
@@ -61,7 +66,8 @@ const userRepository = {
     updateViews,
     deleteUrl,
     getUserData,
-    getUrlUser
+    getUrlUser,
+    getRanking
 
 }
 

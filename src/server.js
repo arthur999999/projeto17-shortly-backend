@@ -12,5 +12,7 @@ app.use(express.json())
 app.use(authRouter)
 app.use(userRouter)
 
-app.listen(process.env.PORT, ()=> {console.log('rodando')})
+const port = process.env.PORT || 5000
+
+app.listen(port, ()=> {console.log('rodando')})
 
